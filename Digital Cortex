@@ -1,0 +1,72 @@
+import time
+import csv
+import math
+from datetime import datetime
+# Mock libraries for the 'Pre-Build' phase. 
+# In the real build, install: pip install adafruit-circuitpython-max6675 adafruit-circuitpython-ads1x15
+import random 
+
+# --- CONFIGURATION: THE ROMER CONSTANTS ---
+ROMER_KEY_FREQ = 44.233  # Target THz (Reference only for metadata)
+PULSE_INTERVAL = 0.025   # 40Hz Modulation (Standard Chopper Speed)
+LOG_FILE = f"romer_data_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+
+def initialize_sensors():
+    print("[-] Initializing 9D Coherence Matrix...")
+    print(f"[-] Target Frequency: {ROMER_KEY_FREQ} THz")
+    print("[-] Sensors: [ONLINE]")
+    return True
+
+def read_cryo_temp():
+    # REPLACE with actual MAX6675 read
+    # Simulating a slow cool-down to 77 Kelvin
+    return 77.4 + (random.random() * 0.5) 
+
+def read_ir_transmission(pulse_state):
+    # REPLACE with ADS1115 read from Pyro-sensor
+    # Simulating Quantum Tunneling Effect:
+    # If Pulse is ON and Temp is Low, Signal should DROP (Absorption)
+    base_noise = 0.05
+    signal = 3.3 if pulse_state else 0.1
+    return signal + (random.uniform(-base_noise, base_noise))
+
+def log_data(writer, timestamp, temp, ir_volts, pulse_state):
+    # The "Raphael Integration": Calculating the Delta
+    writer.writerow([timestamp, temp, ir_volts, pulse_state])
+    
+    # Real-time Monitor
+    status = "|| ABSORPTION EVENT ||" if (pulse_state and ir_volts < 2.0) else "..."
+    print(f"T: {temp:.2f}K | IR: {ir_volts:.2f}V | {status}")
+
+# --- EXECUTION LOOP ---
+def run_experiment(duration_seconds=60):
+    print(f"[-] STARTING RUN. LOGGING TO: {LOG_FILE}")
+    
+    with open(LOG_FILE, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Timestamp", "Temp_K", "IR_Voltage", "Pulse_Active"])
+        
+        start_time = time.time()
+        while (time.time() - start_time) < duration_seconds:
+            
+            # 1. The Knock (Modulate the Source)
+            # We toggle the state based on the 40Hz interval
+            current_time = time.time()
+            pulse_active = (int(current_time / PULSE_INTERVAL) % 2) == 0
+            
+            # 2. The Observation (Read Sensors)
+            temp = read_cryo_temp()
+            ir = read_ir_transmission(pulse_active)
+            
+            # 3. The Record (Write to CSV)
+            log_data(writer, current_time, temp, ir, pulse_active)
+            
+            # Sync to the 'Now'
+            time.sleep(0.01)
+
+    print("[-] RUN COMPLETE. DATA SECURED.")
+
+if __name__ == "__main__":
+    initialize_sensors()
+    run_experiment(60)
+
