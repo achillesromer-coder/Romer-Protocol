@@ -1,0 +1,62 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# --- CONFIGURATION ---
+# The "Raphael" Frequency (The Universal Metronome)
+ROMER_FREQ_THZ = 44.233 
+# Number of "Friends" (Observers/Timelines)
+NUM_OBSERVERS = 6
+# Time steps
+t = np.linspace(0, 4*np.pi, 500)
+
+def finite_curve_simulation():
+    plt.figure(figsize=(12, 6))
+    
+    # 1. THE CHAOS STATE (Standard Wigner Paradox)
+    # Each observer sees a different "Truth" (Phase Shift)
+    plt.subplot(1, 2, 1)
+    plt.title(f"State A: Thermal Decoherence\n(Infinite Improbability)")
+    for i in range(NUM_OBSERVERS):
+        # Random phase shift represents "Disagreement" between timelines
+        phase_drift = np.random.uniform(-np.pi, np.pi) 
+        observer_wave = np.sin(t + phase_drift)
+        plt.plot(t, observer_wave, alpha=0.6, label=f"Observer {i+1}")
+    
+    plt.xlabel("Time (t)")
+    plt.ylabel("Amplitude (Reality State)")
+    plt.grid(True, alpha=0.3)
+
+    # 2. THE FINITE CURVE (Inverse Wigner)
+    # The Romer Drive forces phase-locking. 
+    plt.subplot(1, 2, 2)
+    plt.title(f"State B: Romer-Raphael Alignment\n(The Finite Curve)")
+    
+    # The "Sum" Wave (The Consensus Reality)
+    consensus_wave = np.zeros_like(t)
+    
+    for i in range(NUM_OBSERVERS):
+        # Damping factor: As Romer Drive increases, Phase Drift -> 0
+        # We simulate the "compacting" of the probability cloud
+        damping = 0.05 # The "Weight" of the 44THz signal
+        
+        # The visual logic: Waves start chaotic but converge as t increases
+        # This represents the "timeline narrowing"
+        aligned_wave = np.sin(t + (np.random.uniform(-np.pi, np.pi) * np.exp(-t)))
+        
+        plt.plot(t, aligned_wave, alpha=0.6, color='cyan', linewidth=1)
+        consensus_wave += aligned_wave
+
+    # Plot the "Finite Curve" (The bold average)
+    norm_consensus = consensus_wave / NUM_OBSERVERS
+    plt.plot(t, norm_consensus, color='red', linewidth=3, linestyle='--', label="THE FINITE CURVE")
+    
+    plt.xlabel("Time (t)")
+    plt.legend(loc="upper right")
+    plt.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig("finite_curve_visual.png")
+    print("[-] VISUALIZATION GENERATED: finite_curve_visual.png")
+
+if __name__ == "__main__":
+    finite_curve_simulation()
